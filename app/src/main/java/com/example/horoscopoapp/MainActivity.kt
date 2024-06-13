@@ -1,38 +1,65 @@
 package com.example.horoscopoapp
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : AppCompatActivity() {
 
-    val horoscopeList: List<Horoscope> = listOf(
-        Horoscope("aries", "Aries", 0),
-        Horoscope("aries", "Taurus", 0),
-        Horoscope("aries", "Gemini", 0),
-        Horoscope("aries", "Cancer", 0),
-        Horoscope("aries", "Leo", 0),
-        Horoscope("aries", "Virgo", 0),
-        Horoscope("aries", "Libra", 0),
-        Horoscope("aries", "Scorpio", 0),
-        Horoscope("aries", "Sagittarius", 0),
-        Horoscope("aries", "Capricorn", 0),
-        Horoscope("aries", "Aquarius", 0),
-        Horoscope("aries", "Pisces", 0),
-
-    )
+    lateinit var horoscopeList: List<Horoscope>
 
     lateinit var recyclerView: RecyclerView
+    lateinit var adapter: HoroscopeAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        horoscopeList = HoroscopeProvider.findAll()
+
         recyclerView = findViewById(R.id.recyclerView)
 
-        val adapter = HoroscopeAdapter(horoscopeList)
+        adapter = HoroscopeAdapter(horoscopeList) { position ->
+            navigateToDetail(horoscopeList[position])
+        }
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+        //recyclerView.layoutManager = GridLayoutManager(this, 2)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.activitymenumain, menu)
+
+        val searchViewItem = menu.findItem(R.id.menu_search)
+        val searchView = searchViewItem.actionView as SearchView
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                if (newText != null) {
+                    horoscopeList = HoroscopeProvider.findAll().filter { getString(it.name).contains(newText, true) }
+                    adapter.updateData(horoscopeList)
+                }
+                return true
+            }
+        })
+
+        return true
+    }
+
+    fun navigateToDetail(horoscope: Horoscope) {
+        val intent: Intent = Intent(this, DetailActivity::class.java)
+        intent.putExtra(DetailActivity.EXTRA_HOROSCOPE_ID, horoscope.id)
+        startActivity(intent)
     }
 }

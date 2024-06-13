@@ -3,11 +3,14 @@ package com.example.horoscopoapp
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class HoroscopeAdapter(private val dataSet: List<Horoscope>) :
-    RecyclerView.Adapter<HoroscopeViewHolder>() {
+class HoroscopeAdapter(
+    private val dataSet: List<Horoscope>,
+    private val onItemClickListener: (Int) -> Unit
+) : RecyclerView.Adapter<HoroscopeViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HoroscopeViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -20,21 +23,42 @@ class HoroscopeAdapter(private val dataSet: List<Horoscope>) :
     override fun getItemCount(): Int {
         return dataSet.size
     }
+
     // Este método se llama cada vez que se va a visualizar una celda,
     // y lo utilizaremos para mostrar los datos de esa celda
     override fun onBindViewHolder(holder: HoroscopeViewHolder, position: Int) {
         val horoscope = dataSet[position]
-        holder.textView.text = horoscope.name
+        holder.render(horoscope)
+        holder.itemView.setOnClickListener {
+            onItemClickListener(position)
+        }
 
     }
 
+    // Este método sirve para actualizar los datos
+    fun updateData (newDataSet: List<Horoscope>) {
+        var dataSet = newDataSet
+        notifyDataSetChanged()
+    }
 }
 
+
 class HoroscopeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    val textView: TextView
+    val nameTextView: TextView
+    val descriptionTextView: TextView
+    val logoImageView: ImageView
+
 
     init {
-        textView = view.findViewById(R.id.nameTextView)
+        nameTextView = view.findViewById(R.id.nameTextView)
+        descriptionTextView = view.findViewById(R.id.descriptionTextView)
+        logoImageView = view.findViewById(R.id.logoImageView)
+    }
+
+    fun render(horoscope: Horoscope) {
+        nameTextView.setText(horoscope.name)
+        descriptionTextView.setText(horoscope.description)
+        logoImageView.setImageResource(horoscope.logo)
     }
 
 }
