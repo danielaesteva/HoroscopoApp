@@ -7,6 +7,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
+import com.example.horoscopoapp.R.*
 
 class DetailActivity : AppCompatActivity() {
 
@@ -18,22 +19,22 @@ class DetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_detail)
+        setContentView(layout.activity_detail)
 
         val id: String = intent.getStringExtra(EXTRA_HOROSCOPE_ID)!!
 
         horoscope = HoroscopeProvider.findById(id)!!
 
-        findViewById<TextView>(R.id.descriptionTextView).setText(horoscope.name)
+        findViewById<TextView>(R.id.detailsDescriptionTextview).setText(horoscope.name)
         findViewById<ImageView>(R.id.logoImageView).setImageResource(horoscope.logo)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.activitymenumain, menu)
+        menuInflater.inflate(R.menu.menu_activity_detail, menu)
         return true
     }
 
-/*    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+ override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_favorite -> {
                 Log.i("MENU", "He hecho click en el menu de favorito")
@@ -45,5 +46,5 @@ class DetailActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }*/
+    }
 }

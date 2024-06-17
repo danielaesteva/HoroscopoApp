@@ -21,7 +21,7 @@
             android:id="@+id/nameTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Horoscope Name"
+            android:text="Horoscope name"
             android:textSize="26sp"
             android:textStyle="bold"/>
 
