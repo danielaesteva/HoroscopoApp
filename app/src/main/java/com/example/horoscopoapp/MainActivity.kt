@@ -3,7 +3,6 @@ package com.example.horoscopoapp
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -47,8 +46,11 @@ class MainActivity : AppCompatActivity() {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 if (newText != null) {
-                    horoscopeList = HoroscopeProvider.findAll().filter { getString(it.name).contains(newText, true) }
-                    adapter.updateData(horoscopeList)
+                    horoscopeList = HoroscopeProvider.findAll().filter {
+                        getString(it.name).contains(newText, true) ||
+                                getString(it.description).contains(newText, true)
+                    }
+                    adapter.updateData(horoscopeList, newText)
                 }
                 return true
             }

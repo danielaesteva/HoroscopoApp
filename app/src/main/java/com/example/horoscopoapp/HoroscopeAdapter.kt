@@ -1,5 +1,8 @@
 package com.example.horoscopoapp
 
+import android.graphics.Color
+import android.text.SpannableString
+import android.text.style.BackgroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,11 +10,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class HoroscopeAdapter(
-    private val dataSet: List<Horoscope>,
-    private val onItemClickListener: (Int) -> Unit
-) : RecyclerView.Adapter<HoroscopeViewHolder>() {
+class HoroscopeAdapter(private var dataSet: List<Horoscope>, private val onItemClickListener: (Int) -> Unit) :
+    RecyclerView.Adapter<HoroscopeViewHolder>() {
 
+    private var highlightText: String? = null
+
+    // Este método se llama para crear nuevas celdas,
+    // y se crear las justas para mostrar en pantalla,
+    // Ya que intentará reciclar las que no se vean
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HoroscopeViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_horoscope, parent, false)
@@ -29,36 +35,61 @@ class HoroscopeAdapter(
     override fun onBindViewHolder(holder: HoroscopeViewHolder, position: Int) {
         val horoscope = dataSet[position]
         holder.render(horoscope)
+        if (highlightText != null) {
+            holder.highlight(highlightText!!)
+        }
         holder.itemView.setOnClickListener {
             onItemClickListener(position)
         }
-
     }
 
     // Este método sirve para actualizar los datos
     fun updateData (newDataSet: List<Horoscope>) {
-        var dataSet = newDataSet
+        updateData(newDataSet, null)
+    }
+
+    fun updateData(newDataSet: List<Horoscope>, highlight: String?) {
+        this.highlightText = highlight
+        dataSet = newDataSet
         notifyDataSetChanged()
     }
+
 }
 
-
+// Esta clase se encarga de guardarnos la vista y no tener que inflarla de nuevo
 class HoroscopeViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    val nameTextView: TextView
-    val descriptionTextView: TextView
-    val logoImageView: ImageView
-
+    private val nameTextView: TextView
+    private val descTextView: TextView
+    private val logoImageView: ImageView
 
     init {
         nameTextView = view.findViewById(R.id.nameTextView)
-        descriptionTextView = view.findViewById(R.id.descriptionTextView)
+        descTextView = view.findViewById(R.id.descriptionTextView)
         logoImageView = view.findViewById(R.id.logoImageView)
     }
 
     fun render(horoscope: Horoscope) {
         nameTextView.setText(horoscope.name)
-        descriptionTextView.setText(horoscope.description)
+        descTextView.setText(horoscope.description)
         logoImageView.setImageResource(horoscope.logo)
     }
 
+    // Subraya el texto que coincide con la busqueda
+    fun highlight(text: String) {
+        try {
+            val highlighted = nameTextView.text.toString().highlight(text)
+            nameTextView.text = highlighted
+        } catch (e: Exception) { }
+        try {
+            val highlighted = descTextView.text.toString().highlight(text)
+            descTextView.text = highlighted
+        } catch (e: Exception) { }
+    }
+}
+
+fun String.highlight(text: String) : SpannableString {
+    val str = SpannableString(this)
+    val startIndex = str.indexOf(text, 0, true)
+    str.setSpan(BackgroundColorSpan(Color.CYAN), startIndex, startIndex + text.length, 0)
+    return str
 }
